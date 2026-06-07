@@ -30,5 +30,5 @@ $ make
 
 <h2 align="left"> Future version </h2>
 
-- V2 version: V1 version + Aes256-gcm and also encrypts folders.
+- V2 version: V1 version + folder encryption.
 - V3 version: V2 version + cascade cipher XChaCha-Aes (xchacha over aes).
