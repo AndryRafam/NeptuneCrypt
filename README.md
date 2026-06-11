@@ -34,7 +34,9 @@ Encrypting file is straightforward. To encrypt folder, first compress the folder
 
 ![Output](https://github.com/AndryRafam/NeptuneCrypt/blob/main/output/enc_dec.gif)
 
-<h2 align="left"> Future version </h2>
+<h2 align="left"> Future upgrade </h2>
 
-- V2 version: V1 version + cascade cipher XChaCha-Aes (xchacha over aes).
+- V1 version + cascade cipher XChaCha-Aes (xchacha over aes).
+- V1 version + SM4 + AES as single cipher.
+
 
