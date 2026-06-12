@@ -4,6 +4,8 @@
 
 <h1 align="left"> NeptuneCrypt (v1) </h1>
 
+![Output](https://github.com/AndryRafam/NeptuneCrypt/blob/main/output/demo.gif)
+
 <h2 algin="left"> About </h2>
 
 NeptuneCrypt is a lightweight CLI encryption software using XChaCha20Poly1305 as cipher for simple encryption and XChaCha-Aes for cascade encryption (xchacha over aes) and SHA256 as hash key derivation function. 
@@ -30,9 +32,6 @@ $ make
 <h2 align="left"> How to encrypt folders ? </h2>
 
 Encrypting file is straightforward. To encrypt folder, first compress the folder and then encrypt with NeptuneCrypt.
-#### The following video shows how it works.
-
-![Output](https://github.com/AndryRafam/NeptuneCrypt/blob/main/output/demo.gif)
 
 <h2 align="left"> Future upgrade </h2>
 
