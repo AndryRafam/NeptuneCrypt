@@ -9,6 +9,7 @@
 
 #include "../simpleCipher/xchacha20Cipher.hpp"
 #include "../simpleCipher/sm4.hpp"
+//#include "../simpleCipher/aes.hpp"
 #include "../password/password_generator.hpp"
 #include "../password/set_echo.hpp"
 
@@ -20,8 +21,8 @@ void about() {
 	std::cout << std::endl;
 	std::cout << "\e[1m";
 	std::cout << "=============================================================\n";
-	std::cout << " NeptuneCrypt Copyright © June 2026 Andry RAFAM ANDRIANJAFY.\n\n";
-	std::cout << " NeptuneCrypt is a free open-source encryption software.\n";
+	std::cout << " PoseidonCrypt Copyright © June 2026 Andry RAFAM ANDRIANJAFY.\n\n";
+	std::cout << " PoseidonCrypt is a free open-source encryption software.\n";
 	std::cout << " Password is randomly generated.\n\n";
 	std::cout << " This software comes with ABSOLUTELY NO WARRANTY.\n\n";
 	std::cout << " License: MIT\n";
@@ -99,9 +100,9 @@ int main(/*int argc, char **argv*/) {
 			xchacha20filefolder(mode, filePath, password);
 			std::cout << "\e[1m" << yellow << "Encrypted Successfully" << "\e[0m" << reset << "\n\n";
 		}
-		/*else if(cipher_selection==3) { // Aes-256-GCM
+		/*else if(cipher_selection==3) { // Aes256-GCM
 
-			std::cout << "\n" << "\e[1m" << yellow << "Aes256-gcm Cihper" << "\e[0m" << reset << std::endl;
+			std::cout << "\n" << "\e[1m" << yellow << "Aes256-GCM Cihper" << "\e[0m" << reset << std::endl;
 			std::cout << "Generated Password >: " << password << std::endl;
 			aesfilefolder(mode, filePath, password);
 			std::cout << "\e[1m" << yellow << "Encrypted Successfully" << "\e[0m" << reset << "\n\n"; 
@@ -126,7 +127,7 @@ int main(/*int argc, char **argv*/) {
 			std::cout << "\e[1m" << yellow << "XChaCha20Poly1305 - Decrypted Successfully" << "\e[0m" << reset << "\n\n";
 		}
 		/*else if(aesfilefolder(mode, filePath, password)) {
-			std::cout << "\e[1m" << yellow << "Aes256-gcm - Decrypted Successfully" << "\e[0m" << reset << "\n\n";
+			std::cout << "\e[1m" << yellow << "Aes256-GCM - Decrypted Successfully" << "\e[0m" << reset << "\n\n";
 		}*/
 		// default
 		else {
