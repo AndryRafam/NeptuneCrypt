@@ -32,6 +32,12 @@ To build NeptuneCrypt, run the following command:
 ```bash
 $ make
 ```
+To run the program:
+
+```bash
+$ ./neptune
+```
+
 <h2 align="left"> How to encrypt folders ? </h2>
 
 Encrypting file is straightforward. To encrypt folder, first compress/archive the folder (.7z, .zip, .rar, .tar etc.) and then encrypt with NeptuneCrypt.
