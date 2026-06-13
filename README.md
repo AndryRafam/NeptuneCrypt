@@ -22,16 +22,23 @@ NeptuneCrypt is a lightweight CLI encryption software using XChaCha20Poly1305, S
 - Debugger: GNU Debugger, Valgrind
 - CryptoPP: Version 8.9.0-2
 
-<h2 align="left"> Building for Linux </h2>
+<h2 align="left"> Build, install and run on Linux </h2>
 
 - GNU Make
 - GNU C++ Compiler 14.2.0 or compatible
   
-To build NeptuneCrypt and execute the program, run the following command on your terminal:
+To build and install NeptuneCrypt on Linux, type the following command in terminal:
+(the executable file will be installed at /usr/local/bin/ directory)
 
 ```bash
-$ make run
+$ sudo make install
 ```
+To run NeptuneCrypt on Linux, type the following command in terminal:
+
+```bash
+$ neptune
+```
+
 <h2 align="left"> How to encrypt folders ? </h2>
 
 Encrypting file is straightforward. To encrypt folder, first compress/archive the folder (.7z, .zip, .rar, .tar etc.) and then encrypt with NeptuneCrypt.
