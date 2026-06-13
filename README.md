@@ -46,7 +46,6 @@ This will remove the executable files. To clean (removing all dependencies and o
 ```bash
 $ make clean
 ```
-<h4 align "left" > Be advised that the command "make clean" will remove the dependencies and objects inside the directory of NeptuneCrypt but the executable file "neptune" inside /usr/local/bin/ directory will remain. </h4>
 
 <h2 align="left"> How to encrypt folders ? </h2>
 
