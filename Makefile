@@ -8,7 +8,7 @@ endif
 
 # 3. Super user only rule
 ifneq ($(shell id -u), 0)
-$(error ERROR: super user (sudo) mode only). Compilation aborted.
+$(error ERROR: You must run 'sudo make' to build this project.)
 endif
 
 ccsrc = $(wildcard src/simpleCipher/*.cpp) \
