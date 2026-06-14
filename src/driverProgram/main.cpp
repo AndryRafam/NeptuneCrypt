@@ -18,20 +18,15 @@
 
 // helper function to show about the program
 void about() {
-	std::cout << std::endl;
-	const std::string aboutText = R"(
-  ===============================================================
-   NeptuneCrypt Copyright © June 2026 Andry RAFAM ANDRIANJAFY.
-   
-   NeptuneCrypt is CLI encryption software. Password is randomly
-   generated.
-	 
-   This software comes with ABSOLUTELY NO WARRANTY.
-	 
-   License: MIT
-  ===============================================================
-	)";
-	std::cout << "\e[1m" << aboutText << "\e[0m"; 
+	const std::string aboutText = R"(NeptuneCrypt, CLI Encryption Software, June 2026
+Andry RAFAM ANDRIANJAFY <andryrafam@protonmail.com>
+https://github.com/andryrafam
+
+  NeptuneCrypt is free software, and
+  comes with ABSOLUTELY NO WARRANTY.
+ ====================================
+)";
+	std::cout << aboutText << std::endl;
 }
 
 // helper to safely get an existing path via user input
@@ -55,15 +50,14 @@ int main(/*int argc, char **argv*/) {
 	std::ios::sync_with_stdio(false);
 	
 	system("clear"); // clear the screen
-
 	about();
-
-	// encryption or decryption
-	std::cout << std::endl;
-	std::cout << "encrypt/decrypt (e/d) ? >: ";
-	std::string mode;
-	std::cin >> mode;
-	std::cin.ignore();
+	
+	label_mode:
+		// encryption or decryption or quit
+		std::cout << "encrypt/decrypt (e/d) ? >: ";
+		std::string mode;
+		std::cin >> mode;
+		std::cin.ignore();
 	
 	// encryption
 	if (mode=="e" || mode=="encrypt") {
@@ -72,7 +66,7 @@ int main(/*int argc, char **argv*/) {
 		std::string filePath = getValidFilePath();
 
 		int cipher_selection = 0; // initialize selection
-		while(cipher_selection != 1 && cipher_selection != 2 /*&& cipher_selection*/) {
+		while(cipher_selection != 1 && cipher_selection != 2 /*&& cipher_selection != 3*/) {
 			std::cout << "\n\e[1mSelect cipher\e[0m\n1: SM4-GCM\n2: XChaCha20Poly1305\nChoice >: ";
 			std::cin >> cipher_selection;
 			std::cin.ignore();
@@ -131,19 +125,28 @@ int main(/*int argc, char **argv*/) {
 			std::cout << "\n\e[1m" << yellow << "XChaCha20Poly1305 - Decrypted Successfully" << "\e[0m" << reset << "\n\n";
 		}
 		/*else if(aesfilefolder(mode, filePath, password)) {
-			std::cout << "\e[1m" << yellow << "Aes256-GCM - Decrypted Successfully" << "\e[0m" << reset << "\n\n";
+			std::cout << "\n\e[1m" << yellow << "Aes256-GCM - Decrypted Successfully" << "\e[0m" << reset << "\n\n";
 		}*/
 		// default
 		else {
-			std::cout << "\n" << "\e[1m" << "Cannot decrypt. Program terminated." << "\e[0m"  << "\n\n";
+			std::cout << "\n\e[1m" << "Cannot decrypt. Program terminated." << "\e[0m"  << "\n\n";
 			return 0;
 		}
 	}
 	
-	// default if not encrypt of decrypt mode
+	// default if not encrypt or decrypt or quit.
 	else {
-		std::cout << "\e[1m" << "Invalid choice. Program terminated." << "\e[0m" << "\n\n";
-		return 0;
+		char c; // choose y/n;
+		std::cout << "Invalid mode. Do you want to quit ? (y/n) >: ";
+		std::cin >> c;
+		std::cin.ignore();
+		if(c=='y') {
+			std::cout << "\n\e[1m" << "Program terminated." << "\e[0m" << "\n\n";
+			return 0;
+		}
+		else {
+			goto label_mode;
+		}
 	}
 	return 0;		
 }
