@@ -47,6 +47,11 @@ bool xchacha20filefolder(std::string mode, std::string filePath, std::string pas
 			//write Salt + IV + Ciphertext into a temporary binary file
 			{
 				FileSink binarySink(tempfile.c_str());
+
+				// writer cipher ID for XChaCha20Poly1305
+				byte cipherID = 0x02;
+				binarySink.Put(&cipherID, 1);
+
 				binarySink.Put(salt, salt.size());
 				binarySink.Put(nonce, nonce.size());
 
@@ -79,6 +84,12 @@ bool xchacha20filefolder(std::string mode, std::string filePath, std::string pas
 			// extract salt and IV out of the decoded temporary file
             std::ifstream in(tempfile_hex.c_str(), std::ios::binary);
 
+			// extract and validate cipher ID
+			byte cipherID = 0;
+			in.read((char*)&cipherID, 1);
+			if (in.gcount()!=1) throw std::runtime_error("File truncated: Missing Cipher ID.");
+			if (cipherID != 0x02) throw std::runtime_error("Cipher ID mismatch: This file was not encrypted with XChaCha20Poly1305");
+			
 			SecByteBlock salt(SALT_SIZE);
 			in.read((char*)salt.data(), salt.size());
 			if (in.gcount() != SALT_SIZE) throw std::runtime_error("File truncated: Missing salt.");
@@ -110,14 +121,15 @@ bool xchacha20filefolder(std::string mode, std::string filePath, std::string pas
 				std::rename(tempfile.c_str(), filePath.c_str()); // rename the decrypted file
 				return true;
 			} else {
-				throw::std::runtime_error("\nAuthentication failed. Wrong password or corrupted data.\n");
+				throw::std::runtime_error("\nAuthentication failed.\n");
 			}
 		}
 	}
 	
 	catch(Exception& ex) {
-		std::cout << "\nError encountered during XChaCha20Poly1305:\n";
+		std::cout << "\nError encountered - Wrong password or Corrupted data.\n";
 		std::cout << ex.what() << "\n";
+		std::cout << "Cannot decrypt.\n\n";
 		
 		// remove the temporary file even decryption failed.
 		std::remove(tempfile.c_str());
