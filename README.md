@@ -16,7 +16,7 @@ The software was built with C++ (std=23) and cryptopp-modern: https://cryptopp-m
 - XChaCha20Poly1305: https://en.wikipedia.org/wiki/ChaCha20-Poly1305
 - SM4-GCM (ShāngMì 4): https://en.wikipedia.org/wiki/SM4_(cipher)
 - Aes256-GCM (orginal name Rijndael): https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
-- Twofish-EAX (aes competition runner up by Bruce Schneier):  
+- Twofish-EAX (aes competition runner up by Bruce Schneier): https://en.wikipedia.org/wiki/Twofish
 
 <h2 align="left"> Tools and Requierments for building and debugging </h2>
 
