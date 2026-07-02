@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <string_view>
 #include <filesystem>
 #include <fstream>
 #include <termios.h>
@@ -12,23 +13,25 @@
 #include "../password/password_generator.hpp"
 #include "../password/set_echo.hpp"
 
-#define reset "\033[0m"
-#define highlight "\033[7m"
+constexpr std::string_view RESET = "\033[0m";
+constexpr std::string_view HIGHLIGHT = "\033[7m";
+constexpr std::string_view BOLD = "\e[1m";
 
-// helper function
+// forward declaration
 void about();
 std::string getValidFilePath();
 char getch();
 bool askToContinue();
+void clearScreen();
+
 /*=======================================================*/
 
 // main function
-int main(/*int argc, char **argv*/) {
+int main() {
 
 	// Main menu
 	main_menu:
-		std::cout << "\033[H\033[J"; // clear the screen
-		about();
+		clearScreen();
 
 	int select_mode = 0; // encrypt or decrypt
 	char ch;
@@ -41,21 +44,21 @@ int main(/*int argc, char **argv*/) {
 
 		// line encrypt
 		if(select_mode==0) {
-			std::cout << "  " << highlight << "< Encrypt >" << reset << " ";
+			std::cout << "  " << HIGHLIGHT << "< Encrypt >" << RESET << " ";
 		} else {
 			std::cout << "  < Encrypt > ";
 		}
 
 		// line decrypt
 		if(select_mode==1) {
-			std::cout << "  " << highlight << "< Decrypt >" << reset << " ";
+			std::cout << "  " << HIGHLIGHT << "< Decrypt >" << RESET << " ";
 		} else {
 			std::cout << "  < Decrypt > ";
 		}
 
 		// line exit
 		if(select_mode==2) {
-			std::cout << "  " << highlight << "< Exit >" << reset << "\n";
+			std::cout << "  " << HIGHLIGHT << "< Exit >" << RESET << "\n";
 		} else {
 			std::cout << "  < Exit >\n";
 		}
@@ -68,7 +71,7 @@ int main(/*int argc, char **argv*/) {
 		} else if(select_mode==1) {
 			std::cout << "\n";
 		} else if(select_mode==2) {
-			std::cout << "                               Exit the Program\n";
+			std::cout << "                              Exit the Program\n";
 		}
 
 		ch = getch();
@@ -97,8 +100,7 @@ int main(/*int argc, char **argv*/) {
 
 	// if the user choice is "Exit", exit the program immediately
 	if(select_mode==2) {
-		std::cout << "\033[H\033[J"; // clear the screen
-		about();
+		clearScreen();
 		std::cout << "Program Terminated.\n\n";
 		return 0; // exit main function right here
 	}
@@ -108,9 +110,8 @@ int main(/*int argc, char **argv*/) {
 	// encryption
 	if (mode=="encrypt") {
 
-		std::cout << "\033[H\033[J"; // clear the screen
-		about();
-		std::cout << "\e[1mEnrolling Encryption Mode\e[0m" << std::endl;
+		clearScreen();
+		std::cout << BOLD << "Enrolling Encryption Mode" << RESET << std::endl;
 		std::string filePath = getValidFilePath();
 
 		const std::vector<std::string> ciphers = {
@@ -131,7 +132,7 @@ int main(/*int argc, char **argv*/) {
 
 			for(size_t i = 0; i < ciphers.size(); ++i) {
 				if(cipher_selection==i) {
-					std::cout << "  > " << highlight << ciphers[i] << reset << "\n";
+					std::cout << "  > " << HIGHLIGHT << ciphers[i] << RESET << "\n";
 				} else {
 					std::cout << "    " << ciphers[i] << "\n";
 				}
@@ -140,12 +141,12 @@ int main(/*int argc, char **argv*/) {
 			// proceed or exit
 			std::cout << "\n";
 			if(action_selection==0) {
-				std::cout << "    " << highlight << "< Proceed >" << reset << "  ";
+				std::cout << "    " << HIGHLIGHT << "< Proceed >" << RESET << "  ";
 			} else {
 				std::cout << "    < Proceed >  ";
 			}
 			if(action_selection==1) {
-				std::cout << "  " << highlight << "< Go Back >" << reset << "\n";
+				std::cout << "  " << HIGHLIGHT << "< Go Back >" << RESET << "\n";
 			} else {
 				std::cout << "  < Go Back >\n";
 			}
@@ -193,26 +194,32 @@ int main(/*int argc, char **argv*/) {
 
 		/*Initialize random number [16,32] length
 		using mersene twister*/
-		std::random_device rd;
-		std::mt19937 gen(rd());
+		static std::random_device rd;
+		static std::mt19937 gen(rd());
 		std::uniform_int_distribution<int> distrib(16,32);
-		int passLen = distrib(gen);
-		std::string password = generatePassword(passLen);
+		std::string password = generatePassword(distrib(gen));
+
+		std::filesystem::path password_file = filePath + "_password.txt";
 
 		// SM4-GCM
 		if(cipher_selection==0) { 
 			
-			std::cout << "\033[H\033[J"; // clear the screen
-			about();
-			std::cout << "\e[1m" << "SM4-GCM Cipher Selected" << "\e[0m" << "\n";
-			std::cout << "Generated Password >: " << password << std::endl;
+			clearScreen();
+			std::cout << BOLD << "SM4-GCM Cipher Selected" << RESET << "\n\n";
+			std::cout << "Generated Password >: " << password << "\n";
+			std::ofstream outFile(password_file);
+			if (outFile) {
+				outFile << password;
+				std::cout << "Password saved at : " << password_file << "\n";
+				std::cout << "Do not lose your password or you will not recover your data.\n";
+				outFile.close();
+			}
 			sm4_cipher(mode, filePath, password);
-			std::cout << "\n\e[1m" << "Encrypted Successfully" << "\e[0m" << "\n"; 
+			std::cout << "\n" << BOLD << "Encrypted Successfully" << RESET << "\n"; 
 			
 			if(askToContinue()) goto main_menu;
 			else {
-				std::cout << "\033[H\033[J"; // clear the screen
-				about();
+				clearScreen();
 				std::cout << "Program Terminated.\n\n";
 				return 0;
 			}
@@ -221,17 +228,22 @@ int main(/*int argc, char **argv*/) {
 		// XChaCha20Poly1305
 		else if(cipher_selection==1) { 
 			
-			std::cout << "\033[H\033[J"; // clear the screen
-			about();
-			std::cout << "\e[1m" << "XChaCha20Poly1305 Cipher Selected" << "\e[0m" << "\n";
-			std::cout << "Generated Password >: " << password << std::endl;
+			clearScreen();
+			std::cout << BOLD << "XChaCha20Poly1305 Cipher Selected" << RESET << "\n\n";
+			std::cout << "Generated Password >: " << password << "\n";
+			std::ofstream outFile(password_file);
+			if (outFile) {
+				outFile << password;
+				std::cout << "Password saved at : " << password_file << "\n";
+				std::cout << "Do not lose your password or you will not recover your data.\n";
+				outFile.close();
+			}
 			xchacha20_cipher(mode, filePath, password);
-			std::cout << "\n\e[1m" << "Encrypted Successfully" << "\e[0m" << "\n";
+			std::cout << "\n" << BOLD << "Encrypted Successfully" << RESET << "\n";
 
 			if(askToContinue()) goto main_menu;
 			else {
-				std::cout << "\033[H\033[J"; // clear the screen
-				about();
+				clearScreen();
 				std::cout << "Program Terminated.\n\n";
 				return 0;
 			}
@@ -240,17 +252,22 @@ int main(/*int argc, char **argv*/) {
 		// Aes256-GCM
 		else if(cipher_selection==2) { 
 
-			std::cout << "\033[H\033[J"; // clear the screen
-			about();
-			std::cout << "\e[1m" << "Aes256-GCM Cihper Selected" << "\e[0m" << "\n";
-			std::cout << "Generated Password >: " << password << std::endl;
+			clearScreen();
+			std::cout << BOLD << "Aes256-GCM Cihper Selected" << RESET << "\n\n";
+			std::cout << "Generated Password >: " << password << "\n";
+			std::ofstream outFile(password_file);
+			if (outFile) {
+				outFile << password;
+				std::cout << "Password saved at : " << password_file << "\n";
+				std::cout << "Do not lose your password or you will not recover your data.\n";
+				outFile.close();
+			}
 			aes_cipher(mode, filePath, password);
-			std::cout << "\n\e[1m" << "Encrypted Successfully" << "\e[0m" << "\n";
+			std::cout << "\n" << BOLD << "Encrypted Successfully" << RESET << "\n";
 			
 			if(askToContinue()) goto main_menu;
 			else {
-				std::cout << "\033[H\033[J"; // clear the screen
-				about();
+				clearScreen();
 				std::cout << "Program Terminated.\n\n";
 				return 0;
 			}
@@ -259,17 +276,22 @@ int main(/*int argc, char **argv*/) {
 		// Twofish-EAX
 		else if(cipher_selection==3) {
 			
-			std::cout << "\033[H\033[J"; // clear the screen
-			about();
-			std::cout << "\e[1m" << "Twofish-EAX Cipher Selected" << "\e[0m" << "\n";
-			std::cout << "Generated Password >: " << password << std::endl;
+			clearScreen();
+			std::cout << BOLD << "Twofish-EAX Cipher Selected" << RESET << "\n\n";
+			std::cout << "Generated Password >: " << password << "\n";
+			std::ofstream outFile(password_file);
+			if (outFile) {
+				outFile << password;
+				std::cout << "Password saved at : " << password_file << "\n";
+				std::cout << "Do not lose your password or you will not recover your data.\n";
+				outFile.close();
+			}
 			twofish_cipher(mode, filePath, password);
-			std::cout << "\n\e[1m" << "Encrypted Successfully" << "\e[0m" << "\n";
+			std::cout << "\n" << BOLD << "Encrypted Successfully" << RESET << "\n";
 
 			if(askToContinue()) goto main_menu;
 			else {
-				std::cout << "\033[H\033[J"; // clear the screen
-				about();
+				clearScreen();
 				std::cout << "Program Terminated.\n\n";
 				return 0;
 			}
@@ -279,9 +301,8 @@ int main(/*int argc, char **argv*/) {
 	// decryption
 	else if(mode=="decrypt") {
 		
-		std::cout << "\033[H\033[J"; // clear the screen
-		about();
-		std::cout << "\e[1mEnrolling Decryption Mode\e[0m" << std::endl;
+		clearScreen();
+		std::cout << BOLD << "Enrolling Decryption Mode" << RESET << std::endl;
 		std::string filePath = getValidFilePath();
 
 		std::ifstream file(filePath);
@@ -320,11 +341,10 @@ int main(/*int argc, char **argv*/) {
 
 		// decryption successful
 		if(success) {
-			std::cout << "\n\e[1m" << "Decrypted Successfully" << "\e[0m" << "\n";
+			std::cout << "\n" << BOLD << "Decrypted Successfully" << RESET << "\n";
 			if(askToContinue()) goto main_menu;
 			else {
-				std::cout << "\033[H\033[J"; // clear the screen
-				about();
+				clearScreen();
 				std::cout << "Program Terminated.\n\n";
 				return 0;
 			}
@@ -333,8 +353,7 @@ int main(/*int argc, char **argv*/) {
 		else {
 			if(askToContinue()) goto main_menu;
 			else {
-				std::cout << "\033[H\033[J"; // clear the screen
-				about();
+				clearScreen();
 				std::cout << "Program Terminated.\n\n";
 				return 0;
 			}
@@ -344,12 +363,14 @@ int main(/*int argc, char **argv*/) {
 	return 0;
 }
 
-/*================================================================*/
+/*================================================================
+// Helper Function
+=================================================================*/
 
 void about() {
-	const std::string aboutText = R"(NeptuneCrypt 1.6, Encryption Software, June 2026
-Andry RAFAM ANDRIANJAFY <andryrafam@protonmail.com>
-https://github.com/andryrafam
+	const std::string aboutText = R"( NeptuneCrypt 1.6, Encryption Software, June 2026
+ Andry RAFAM ANDRIANJAFY <andryrafam@protonmail.com>
+ https://github.com/andryrafam
 
  NeptuneCrypt is free software, and
  comes with ABSOLUTELY NO WARRANTY.
@@ -357,7 +378,6 @@ https://github.com/andryrafam
 	std::cout << aboutText << std::endl;
 }
 
-// helper function to safely get an existing path via user input
 std::string getValidFilePath() {
 	std::string filePath;
 	while(true) {
@@ -368,11 +388,10 @@ std::string getValidFilePath() {
 			return filePath;
 		}
 		// if file doesn't exist repeat the process
-		std::cout << "\e[1m" << "File doesn't exist." << "\e[0m" << std::endl;
+		std::cout << BOLD << "File doesn't exist." << RESET << std::endl;
 	}
 }
 
-// helper function for interactive mode
 char getch() {
     struct termios oldt, newt; // old terminal, new terminal
     char ch;
@@ -385,7 +404,6 @@ char getch() {
     return ch;
 }
 
-// helper function to handle user continuation safely
 bool askToContinue() {
 	char yn; // [y/n]
 	while(true) {
@@ -397,4 +415,9 @@ bool askToContinue() {
 		if(yn=='n' || yn=='N') return false;
 		std::cout << "Invalid input. Only [y/n].\n"; // invalid input try again
 	}
+}
+
+void clearScreen() {
+	std::cout << "\033[H\033[J"; // clear the screen
+	about();
 }
